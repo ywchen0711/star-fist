@@ -25,9 +25,19 @@ export const AUTO = { on: false, log: null };
 function panel(f, x, right) {
   windowBox(x, 2, 124, 48, { accent: right ? '#ff9a8a' : '#8ad8ff' });
   const nm = nameOf(f) + (f.foe ? '' : ' Lv' + f.lv);
-  text(nm, x + 8, 5, f.foe ? '#ffc8b0' : '#ffe070');
-  if (f.buf && f.buf.stone > 0) text(L('岩', 'St'), x + 116, 5, '#d0b080', { align: 'right' });
-  if (f.buf && f.buf.gale > 0) text(L('風', 'Ga'), x + 102, 5, '#70f0b8', { align: 'right' });
+  // buffs and the Golden Flame as coloured tags beside the name; if they do not fit, they take turns with the name
+  const tags = [];
+  if (f.buf && f.buf.stone > 0) tags.push([L('岩', 'ROCK') + f.buf.stone, '#d0b080']);
+  if (f.buf && f.buf.gale > 0) tags.push([L('風', 'GALE') + f.buf.gale, '#70f0b8']);
+  if (f.gold) tags.push([L('金焰', 'GOLD'), '#ffd040']);
+  const tw = tags.reduce((a, g) => a + textW(g[0]) + 4, -4), beside = tw <= 108 - textW(nm) - 6;
+  const pages = [];
+  for (const g of tags) { const last = pages[pages.length - 1], w = textW(g[0]); if (last && last.w + 4 + w <= 108) { last.t.push(g); last.w += 4 + w; } else pages.push({ t: [g], w }); }
+  const ph = beside ? 0 : Math.floor(B.t / 60) % (pages.length + 1);
+  if (ph === 0) text(nm, x + 8, 5, f.foe ? '#ffc8b0' : '#ffe070');
+  const show = beside ? tags : ph > 0 ? pages[ph - 1].t : [];
+  let cx = x + 116;
+  for (const [s, c] of show.slice().reverse()) { text(s, cx, 5, c, { align: 'right' }); cx -= textW(s) + 4; }
   text(L('戰鬥力', 'PL'), x + 8, 17, '#a8c8ff');
   text(num(R.pl(f)), x + 116, 17, f.gold ? '#ffd040' : '#ffffff', { align: 'right' });
   const hp = Math.max(0, f.hp), mx = R.maxHp(f);
