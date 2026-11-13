@@ -89,6 +89,13 @@ export async function talk(lines) { for (const [who, zh, en] of lines) await say
 
 // ---------- a list menu ----------
 // items: [{ label, sub?, disabled?, icon?(x,y) }]; returns the index or -1 (cancel)
+// shorten a string with "…" so it fits in w pixels
+export function fit(s, w) {
+  s = String(s);
+  if (textW(s) <= w) return s;
+  while (s.length > 1 && textW(s + '…') > w) s = s.slice(0, -1);
+  return s.trimEnd() + '…';
+}
 export function menu(items, { x = 8, y = 8, w = null, title = null, cancel = true, auto = null, start = 0, rows = 8, onMove = null, hint = null } = {}) {
   const width = w || Math.min(240, Math.max(70, ...items.map((it) => textW(it.label) + (it.sub ? textW(it.sub) + 16 : 0) + 30)), title ? textW(title) + 20 : 0);
   const vis = Math.min(rows, items.length);
@@ -108,7 +115,8 @@ export function menu(items, { x = 8, y = 8, w = null, title = null, cancel = tru
       } else if (input.pressed('b') && cancel && this.age > 2) { sfx('cancel'); this.done(-1); }
     },
     draw() {
-      const yy = typeof y === 'function' ? y(h) : y, xx = typeof x === 'function' ? x(width) : x;
+      // a tall list moves up (and a wide one left) so it never runs off the screen
+      const yy = Math.max(2, Math.min(H - 2 - h, typeof y === 'function' ? y(h) : y)), xx = Math.max(2, Math.min(W - 2 - width, typeof x === 'function' ? x(width) : x));
       windowBox(xx, yy, width, h);
       let oy = yy + 6;
       if (title) { text(title, xx + 10, oy, '#ffe070'); oy += 15; }
@@ -118,12 +126,15 @@ export function menu(items, { x = 8, y = 8, w = null, title = null, cancel = tru
         const col = it.disabled ? '#6a6890' : it.col || '#f4f4ff';
         let tx = xx + 16;
         if (it.icon) { it.icon(tx, oy - 2); tx += 18; }
-        text(it.label, tx, oy, col);
+        // a long name is shortened rather than running into the number on its right
+        text(fit(it.label, xx + width - 8 - tx - (it.sub ? textW(it.sub) + 8 : 0)), tx, oy, col);
         if (it.sub) text(it.sub, xx + width - 8, oy, it.disabled ? '#6a6890' : it.subCol || '#a8c8ff', { align: 'right' });
         if (k === this.sel) cursor(xx + 6, oy + 5, frame);
         oy += 15;
       }
       if (this.top > 0) cursor(xx + width / 2, yy + 2, 0, false);
+      // more rows below: a small blinking arrow on the bottom edge
+      if (this.top + vis < items.length && (frame >> 3) % 2) { ctx.fillStyle = '#ffe070'; for (let i = 0; i < 4; i++) ctx.fillRect(xx + width / 2 - 3 + i, yy + h - 7 + i, 7 - i * 2, 1); }
       if (hint) hint(this.sel, xx, yy, width, h);
     },
   };

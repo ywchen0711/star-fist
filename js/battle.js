@@ -4,7 +4,7 @@ import { goldTint } from './gfx.js';
 import { ctx, W, H, text, textW, bigText, windowBox, bar, drawCard, CARD_W, CARD_H, cardBack, paintSky, fighterArt, face, itemIcon, drawTwinkles, mix, hash } from './gfx.js';
 import { input } from './input.js';
 import { sfx, playMusic, currentSong, jingle } from './audio.js';
-import { push, UI, menu, notice, say, wrap } from './ui.js';
+import { push, UI, menu, notice, say, wrap, fit } from './ui.js';
 import { L, tn, num } from './i18n.js';
 import { HEROES, ENEMIES, SPECIALS, ITEMS, BLAST_KI, COUNTER_KI, GOLD_COST } from './data.js';
 import * as R from './rules.js';
@@ -34,7 +34,7 @@ function panel(f, x, right) {
   const pages = [];
   for (const g of tags) { const last = pages[pages.length - 1], w = textW(g[0]); if (last && last.w + 4 + w <= 108) { last.t.push(g); last.w += 4 + w; } else pages.push({ t: [g], w }); }
   const ph = beside ? 0 : Math.floor(B.t / 60) % (pages.length + 1);
-  if (ph === 0) text(nm, x + 8, 5, f.foe ? '#ffc8b0' : '#ffe070');
+  if (ph === 0) text(fit(nm, 108), x + 8, 5, f.foe ? '#ffc8b0' : '#ffe070');
   const show = beside ? tags : ph > 0 ? pages[ph - 1].t : [];
   let cx = x + 116;
   for (const [s, c] of show.slice().reverse()) { text(s, cx, 5, c, { align: 'right' }); cx -= textW(s) + 4; }
@@ -308,9 +308,9 @@ async function battleOnce(foeIds, opts) {
         return 0;
       };
       const k = await menu(cmds, { x: 4, y: 140, w: 100, cancel: false, auto: autoCmd, hint: () => {
-        text(nameOf(p) + L(' 的回合', "'s turn"), 112, 146, '#ffe070');
+        text(fit(nameOf(p) + L(' 的回合', "'s turn"), W - 120), 112, 146, '#ffe070');
         text(L('氣 ', 'Ki ') + p.ki + '/100', 112, 162, '#80d8ff');
-        text(L('對手 ', 'Foe: ') + nameOf(e), 112, 178, '#ffc8b0');
+        text(fit(L('對手 ', 'Foe: ') + nameOf(e), W - 120), 112, 178, '#ffc8b0');
         const left = B.foes.length - B.ei - 1;
         if (left > 0) text(L('後面還有 ' + left + ' 個', left + ' more waiting'), 112, 194, '#c8c8e8');
       } });

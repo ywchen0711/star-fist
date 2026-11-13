@@ -2,7 +2,7 @@
 import { ctx, W, H, text, textW, windowBox, bar, face, itemIcon, drawCard, drawMoveCard, cursor, paintSky, fighterArt, bigText } from './gfx.js';
 import { input } from './input.js';
 import { sfx } from './audio.js';
-import { push, UI, menu, notice, say, wrap } from './ui.js';
+import { push, UI, menu, notice, say, wrap, fit } from './ui.js';
 import { L, tn, num } from './i18n.js';
 import { HEROES, SPECIALS, ITEMS, needExp } from './data.js';
 import * as R from './rules.js';
@@ -27,7 +27,7 @@ export function statusScreen() {
         const y = 10 + i * 34;
         const img = fighterArt({ k: 'c', n: HEROES[m.id].sheet }, 'r').idle[0];
         ctx.globalAlpha = m.ko ? 0.4 : 1; ctx.drawImage(img, 14, y); ctx.globalAlpha = 1;
-        text(tn(HEROES[m.id].name), 32, y, i === this.sel ? '#ffe070' : '#f4f4ff');
+        text(fit(tn(HEROES[m.id].name), 44), 32, y, i === this.sel ? '#ffe070' : '#f4f4ff');
         bar(32, y + 16, 40, m.hp, R.maxHp(m), '#58e070', 2);
         if (i === this.sel) cursor(6, y + 8, 0);
       });
@@ -36,7 +36,7 @@ export function statusScreen() {
       const f = face(h.sheet);
       if (f) { ctx.fillStyle = '#3a3a7a'; ctx.fillRect(90, 10, 40, 40); ctx.drawImage(f, 91, 11); }
       text(tn(h.name), 138, 10, '#ffe070');
-      text(tn(h.title), 138, 24, '#c8c8e8');
+      text(fit(tn(h.title), W - 148), 138, 24, '#c8c8e8');
       text('Lv ' + m.lv + (h.guest ? L('（客人）', ' (guest)') : ''), 138, 38, '#ffffff');
       let y = 56;
       const row = (a, b, col = '#ffffff') => { text(a, 92, y, '#a8c8ff'); text(b, W - 10, y, col, { align: 'right' }); y += 14; };
@@ -47,12 +47,13 @@ export function statusScreen() {
       text(L('必殺技', 'Special moves'), 92, y, '#ffe070'); y += 14;
       for (const [lv, s] of h.learn) {
         const has = m.lv >= lv;
-        text(has ? tn(SPECIALS[s].name) : '？？？', 98, y, has ? '#ffffff' : '#6a6890');
-        text(has ? SPECIALS[s].ki + L('氣', ' ki') : 'Lv' + lv, W - 10, y, has ? '#80d8ff' : '#6a6890', { align: 'right' });
+        const rt = has ? SPECIALS[s].ki + L('氣', ' ki') : 'Lv' + lv;
+        text(has ? fit(tn(SPECIALS[s].name), W - 10 - 98 - textW(rt) - 6) : '？？？', 98, y, has ? '#ffffff' : '#6a6890');
+        text(rt, W - 10, y, has ? '#80d8ff' : '#6a6890', { align: 'right' });
         y += 13;
       }
-      if (m.id === 'kai' && S.flags.golden) { text(L('金焰覺醒（30氣）', 'Golden Flame (30 ki)'), 98, y, '#ffd040'); y += 13; text(tn(SPECIALS.goldmeteor.name), 98, y, '#ffd040'); text('50' + L('氣', ' ki'), W - 10, y, '#ffd040', { align: 'right' }); }
-      text(L('X 返回', 'X: back'), W - 10, H - 16, '#8888b0', { align: 'right' });
+      if (m.id === 'kai' && S.flags.golden) { text(L('金焰覺醒（30氣）', 'Golden Flame (30 ki)'), 98, y, '#ffd040'); y += 13; text(fit(tn(SPECIALS.goldmeteor.name), W - 114 - textW('50' + L('氣', ' ki'))), 98, y, '#ffd040'); text('50' + L('氣', ' ki'), W - 10, y, '#ffd040', { align: 'right' }); }
+      text(L('X 返回', 'X: back'), W - 10, H - 19, '#8888b0', { align: 'right' });
     },
   });
 }
@@ -64,7 +65,7 @@ export async function itemMenu() {
     if (!ids.length) { await notice('沒有道具。', 'No items.', { frames: 40 }); return; }
     const r = await menu(ids.map((id) => ({ label: tn(ITEMS[id].name), sub: '×' + S.items[id], icon: (x, y) => itemIcon(ITEMS[id].icon, x, y) })), {
       x: 8, y: 24, w: 160, rows: 7, title: L('道具', 'Items'),
-      hint: (sel, xx, yy, w, h) => { windowBox(8, yy + h + 2, 240, 24); text(tn(ITEMS[ids[sel]].desc), 16, yy + h + 8, '#e0e4ff'); },
+      hint: (sel, xx, yy, w, h) => { const ls = wrap(tn(ITEMS[ids[sel]].desc), 224).slice(0, 3); windowBox(8, yy + h + 2, 240, 10 + ls.length * 14); ls.forEach((l, i) => text(l, 16, yy + h + 8 + i * 14, '#e0e4ff')); },
     });
     if (r < 0) return;
     const id = ids[r];
@@ -131,8 +132,8 @@ export function setTownTalk(f) { townTalk = f; }
 export async function shop(stock) {
   for (;;) {
     const r = await menu(stock.map((id) => ({ label: tn(ITEMS[id].name), sub: ITEMS[id].price + L('幣', 'c'), icon: (x, y) => itemIcon(ITEMS[id].icon, x, y), disabled: S.coins < ITEMS[id].price })), {
-      x: 8, y: 24, w: 170, rows: 6, title: L('買什麼？　◎', 'Buy what?  ◎') + S.coins,
-      hint: (sel, xx, yy, w, h) => { windowBox(8, yy + h + 2, 240, 38); text(tn(ITEMS[stock[sel]].desc), 16, yy + h + 8, '#e0e4ff'); text(L('持有 ', 'Have ') + (S.items[stock[sel]] || 0), 16, yy + h + 22, '#a8c8ff'); },
+      x: 8, y: 24, w: 170, rows: 5, title: L('買什麼？　◎', 'Buy what?  ◎') + S.coins,
+      hint: (sel, xx, yy, w, h) => { const ls = wrap(tn(ITEMS[stock[sel]].desc), 224).slice(0, 3); windowBox(8, yy + h + 2, 240, 24 + ls.length * 14); ls.forEach((l, i) => text(l, 16, yy + h + 8 + i * 14, '#e0e4ff')); text(L('持有 ', 'Have ') + (S.items[stock[sel]] || 0), 16, yy + h + 8 + ls.length * 14, '#a8c8ff'); },
     });
     if (r < 0) return;
     const id = stock[r];
