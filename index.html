@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>星拳傳說 Legend of the Star Fist</title>
+<meta name="description" content="原創的 16 位元卡牌格鬥角色扮演遊戲：星裔少年凱與夥伴對抗來自宇宙的鐵彗軍團。中英雙語。An original 16-bit card-battle martial-arts RPG in Chinese and English.">
+<link rel="preload" href="fonts/Cubic_11.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 1l2 5h5l-4 3 2 6-5-4-5 4 2-6-4-3h5z%27 fill=%27%23ffd040%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button id="musicBtn" type="button" aria-label="Music on/off" title="Music on/off (M)">&#9835;</button>
+<div id="wrap"><canvas id="screen" width="256" height="224"></canvas></div>
+<div id="touch">
+  <div class="dpad"><div class="u" data-k="up"></div><div class="l" data-k="left"></div><div class="c"></div><div class="r" data-k="right"></div><div class="d" data-k="down"></div></div>
+  <div class="btn b" data-k="b">X</div>
+  <div class="btn a" data-k="a">Z</div>
+  <div class="btn m" data-k="menu" id="menuBtn">MENU</div>
+</div>
+<script>
+  // whole-number scaling so every game pixel is an even square
+  function fit() {
+    var touch = document.body.classList.contains('touching');
+    var dpr = window.devicePixelRatio || 1;
+    var aw = innerWidth * dpr, ah = (innerHeight - (touch ? 190 : 0)) * dpr;
+    var k = Math.max(1, Math.floor(Math.min(aw / 256, ah / 224)));
+    var c = document.getElementById('screen');
+    if (c.width !== 256 * k) { c.width = 256 * k; c.height = 224 * k; }
+    c.style.width = (256 * k) / dpr + 'px'; c.style.height = (224 * k) / dpr + 'px';
+  }
+  addEventListener('resize', fit);
+  new MutationObserver(fit).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  fit();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
