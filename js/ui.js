@@ -1,10 +1,10 @@
 // Dialogue boxes, choices, list menus and notices. Each returns a promise, so story scripts are
 // plain async code; the main loop feeds the top window input and draws the whole stack.
-import { ctx, W, H, text, textW, windowBox, cursor, face } from './gfx.js';
-import { input } from './input.js';
-import { sfx } from './audio.js';
-import { L, tn } from './i18n.js';
-import { PEOPLE } from './data.js';
+import { ctx, W, H, text, textW, windowBox, cursor, face } from './gfx.js?v=2';
+import { input } from './input.js?v=2';
+import { sfx } from './audio.js?v=2';
+import { L, tn } from './i18n.js?v=2';
+import { PEOPLE } from './data.js?v=2';
 
 const stack = [];
 export const UI = {

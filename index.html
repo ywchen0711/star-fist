@@ -5,13 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>星拳傳說 Legend of the Star Fist</title>
 <meta name="description" content="原創的 16 位元卡牌格鬥角色扮演遊戲：星裔少年凱與夥伴對抗來自宇宙的鐵彗軍團。中英雙語。An original 16-bit card-battle martial-arts RPG in Chinese and English.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="星拳傳說">
+<meta name="theme-color" content="#05040f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/Cubic_11.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 1l2 5h5l-4 3 2 6-5-4-5 4 2-6-4-3h5z%27 fill=%27%23ffd040%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <button id="musicBtn" type="button" aria-label="Music on/off" title="Music on/off (M)">&#9835;</button>
 <div id="wrap"><canvas id="screen" width="256" height="224"></canvas></div>
+<div id="sa"></div>
 <div id="touch">
   <div class="dpad"><div class="u" data-k="up"></div><div class="l" data-k="left"></div><div class="c"></div><div class="r" data-k="right"></div><div class="d" data-k="down"></div></div>
   <div class="btn b" data-k="b">X</div>
@@ -19,20 +27,40 @@
   <div class="btn m" data-k="menu" id="menuBtn">MENU</div>
 </div>
 <script>
-  // whole-number scaling so every game pixel is an even square
+  // Whole-number scaling so every game pixel is an even square. On a phone or tablet, when whole pixels
+  // would leave more than a tenth of the room unused, the picture fills it instead (those sharp screens
+  // hide the uneven pixels). Held sideways on a touch screen, the pad goes beside the picture when that
+  // gives a bigger picture than putting it underneath.
   function fit() {
-    var touch = document.body.classList.contains('touching');
-    var dpr = window.devicePixelRatio || 1;
-    var aw = innerWidth * dpr, ah = (innerHeight - (touch ? 190 : 0)) * dpr;
-    var k = Math.max(1, Math.floor(Math.min(aw / 256, ah / 224)));
+    var body = document.body, touch = body.classList.contains('touching');
+    var dpr = window.devicePixelRatio || 1, coarse = matchMedia('(pointer: coarse)').matches;
+    var cs = getComputedStyle(document.getElementById('sa'));
+    var sa = { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
+    var w = innerWidth - sa.l - sa.r, h = innerHeight - sa.t, side = false;
+    var sc = function (w, h) { return Math.min(w / 256, h / 224); };
+    var SW = innerWidth >= 1000 ? 205 : 170;
+    if (touch) {
+      side = sc(w - 2 * SW, h - sa.b) > sc(w, h - 190 - sa.b);
+      if (side) { w -= 2 * SW; h -= sa.b; } else h -= 190 + sa.b;
+    } else h -= sa.b;
+    if (body.classList.contains('side') !== side) body.classList.toggle('side', side);
+    var full = sc(w, h), k = Math.max(1, Math.floor(full * dpr)), css = k / dpr;
+    if (coarse && dpr >= 2 && css < full * 0.9) css = full;
     var c = document.getElementById('screen');
     if (c.width !== 256 * k) { c.width = 256 * k; c.height = 224 * k; }
-    c.style.width = (256 * k) / dpr + 'px'; c.style.height = (224 * k) / dpr + 'px';
+    c.style.width = Math.round(256 * css) + 'px'; c.style.height = Math.round(224 * css) + 'px';
   }
   addEventListener('resize', fit);
+  // iPhone / iPad: fit again after a turn or when the Safari bars come and go; no pinch or double-tap zoom
+  addEventListener('orientationchange', function () { setTimeout(fit, 250); });
+  addEventListener('pageshow', fit);
+  if (window.visualViewport) visualViewport.addEventListener('resize', fit);
+  addEventListener('gesturestart', function (e) { e.preventDefault(); });
+  addEventListener('dblclick', function (e) { e.preventDefault(); });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
   new MutationObserver(fit).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   fit();
 </script>
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js?v=2"></script>
 </body>
 </html>

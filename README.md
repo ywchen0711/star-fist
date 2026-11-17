@@ -33,6 +33,14 @@ On phones, the on-screen pad and Z / X buttons appear when you touch the screen.
 
 There is no build step. Serve the folder with any static web server, for example `python -m http.server`, and open `index.html`.
 
+## iPhone and iPad
+
+- The touch buttons also appear on iPad. Held upright they sit under the picture; held sideways they move to the left and right of it.
+- iPhone and iPad play the music as AAC (`.m4a` copies of the `.ogg` files), since Safari before iOS 18.4 cannot play Ogg. The board is saved when you leave the page, since iOS can close a tab in the background.
+- Sound starts with your first tap. It keeps playing with the ring/silent switch on silent (iOS 17 and later), and comes back after a call, Siri or the lock screen.
+- **Add to Home Screen** from Safari's Share menu to play full screen with its own icon.
+- The game runs at the same speed on 120 Hz ProMotion screens and in Low Power Mode.
+
 ## Credits
 
 Art, music and effects come from the Ninja Adventure Asset Pack by Pixel-boy and AAA (CC0). The font is Cubic 11 (SIL OFL 1.1). The story, rules, cards and code are original. See [CREDITS.md](CREDITS.md).

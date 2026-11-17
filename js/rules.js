@@ -8,7 +8,7 @@
 //  3. The defender picks: guard (half damage, +6 ki), dodge (works only if the defender's number is
 //     at least the attacker's number; a failed dodge takes 20% more), or counter a beam with a beam
 //     of their own (20 ki) and push it back in a beam clash.
-import { HEROES, SPECIALS, ENEMIES, ITEMS, needExp, MAX_LV, PL_GROWTH, GOLD_MULT, GOLD_COST, GOLD_DRAIN, RUSH_POW, BLAST_POW, BLAST_KI, COUNTER_KI } from './data.js';
+import { HEROES, SPECIALS, ENEMIES, ITEMS, needExp, MAX_LV, PL_GROWTH, GOLD_MULT, GOLD_COST, GOLD_DRAIN, RUSH_POW, BLAST_POW, BLAST_KI, COUNTER_KI } from './data.js?v=2';
 
 export const KI_MAX = 100;
 const clampKi = (f) => { f.ki = Math.max(0, Math.min(KI_MAX, Math.round(f.ki))); };

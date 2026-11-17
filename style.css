@@ -16,3 +16,24 @@ body.touching #touch { display: block; }
 #musicBtn { position: fixed; top: 8px; right: 8px; z-index: 20; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.45); background: rgba(20,24,60,0.6); color: #fff; font: 20px sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 #musicBtn.off { opacity: 0.6; }
 #musicBtn.off::after { content: ''; position: absolute; width: 30px; height: 3px; background: #ff6070; transform: rotate(-45deg); border-radius: 2px; }
+/* iPhone / iPad: no bounce, no long-press callout or magnifier, no grey tap flash */
+html, body { overscroll-behavior: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+body { position: fixed; inset: 0; height: 100dvh; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); box-sizing: border-box; }
+#sa { position: fixed; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+#touch { padding-bottom: env(safe-area-inset-bottom); }
+#musicBtn { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); }
+/* held sideways the pad goes beside the picture: D-pad on the left, buttons on the right */
+body.side #touch { position: fixed; inset: 0; width: auto; max-width: none; height: auto; padding: 0; pointer-events: none; }
+body.side #touch > div { pointer-events: auto; }
+body.side .dpad { left: max(16px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); }
+body.side .btn.a { right: max(18px, env(safe-area-inset-right)); bottom: calc(max(18px, env(safe-area-inset-bottom)) + 64px); }
+body.side .btn.b { right: calc(max(18px, env(safe-area-inset-right)) + 74px); bottom: max(18px, env(safe-area-inset-bottom)); }
+body.side .btn.m { right: calc(max(8px, env(safe-area-inset-right)) + 52px); top: max(10px, env(safe-area-inset-top)); bottom: auto; }
+/* a tablet gets thumb-sized buttons, a little bigger than a phone's */
+@media (min-width: 700px) and (min-height: 600px) and (pointer: coarse) {
+  .dpad { transform: scale(1.2); transform-origin: left bottom; }
+  .btn.a, .btn.b { transform: scale(1.2); }
+  body.side .dpad { left: max(28px, env(safe-area-inset-left)); bottom: max(28px, env(safe-area-inset-bottom)); }
+  body.side .btn.a { right: max(30px, env(safe-area-inset-right)); bottom: calc(max(28px, env(safe-area-inset-bottom)) + 76px); }
+  body.side .btn.b { right: calc(max(30px, env(safe-area-inset-right)) + 92px); bottom: max(28px, env(safe-area-inset-bottom)); }
+}

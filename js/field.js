@@ -1,13 +1,13 @@
 // The board: painting a region's star chart, picking a movement card and walking its star number
 // along the paths. Story scenes wait on event spots; fights, towns, springs and chests on others.
-import { ctx, W, H, canvas, text, textW, windowBox, mix, hash, bayer, drawMoveCard, MCARD_W, drawStar, walkFrames, twinkle, cursor, bar } from './gfx.js';
-import { input } from './input.js';
-import { sfx } from './audio.js';
-import { push, UI, wrap } from './ui.js';
-import { L, tn } from './i18n.js';
-import { BOARDS } from './maps.js';
-import { S, moveHand } from './state.js';
-import { maxHp } from './rules.js';
+import { ctx, W, H, canvas, text, textW, windowBox, mix, hash, bayer, drawMoveCard, MCARD_W, drawStar, walkFrames, twinkle, cursor, bar } from './gfx.js?v=2';
+import { input } from './input.js?v=2';
+import { sfx } from './audio.js?v=2';
+import { push, UI, wrap } from './ui.js?v=2';
+import { L, tn } from './i18n.js?v=2';
+import { BOARDS } from './maps.js?v=2';
+import { S, moveHand } from './state.js?v=2';
+import { maxHp } from './rules.js?v=2';
 
 export const FIELD = { board: null, objective: null, objText: null, t: 0, facing: 'd', anim: null, walkT: 0 };
 const TOP = 18, BOT = 166;

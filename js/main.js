@@ -1,19 +1,19 @@
 // Boot, the main loop, the title screen, story stages, chapter flow, the ending and credits,
 // and the test hooks on window.G.
-import { ctx, W, H, present, text, textW, bigText, windowBox, paintSky, drawTwinkles, fighterArt, loadImages, mix, hash, bayer, drawStar, view, drawCard, cursor, canvas } from './gfx.js';
-import { input, pollInput, endInput, setupTouch } from './input.js';
-import { initAudio, playMusic, sfx, jingle } from './audio.js';
-import { UI, uiTick, push, say, talk, menu, notice, wait, wrap } from './ui.js';
-import { L, tn, setLang, LANG, num } from './i18n.js';
-import { HEROES, ENEMIES, ITEMS, PEOPLE } from './data.js';
-import * as R from './rules.js';
-import { S, reset, save, load, hasSave, addMember, removeMember, member, addItem, fullHeal, moveHand } from './state.js';
-import { BOARDS, TOWNS, CHAPTERS } from './maps.js';
-import { FIELD, drawField, pickCard, walkSteps, pathTo, setBoard, node } from './field.js';
-import { battle, drawBattle, B, AUTO } from './battle.js';
-import { fieldMenu, town, setTownTalk, howToPlay } from './menu.js';
-import { STORY, TALK } from './story.js';
-import { CINE, playGolden, drawAura, drawFighter, beamClash, playExchange } from './cinema.js';
+import { ctx, W, H, present, text, textW, bigText, windowBox, paintSky, drawTwinkles, fighterArt, loadImages, mix, hash, bayer, drawStar, view, drawCard, cursor, canvas } from './gfx.js?v=2';
+import { input, pollInput, endInput, setupTouch } from './input.js?v=2';
+import { initAudio, playMusic, sfx, jingle } from './audio.js?v=2';
+import { UI, uiTick, push, say, talk, menu, notice, wait, wrap } from './ui.js?v=2';
+import { L, tn, setLang, LANG, num } from './i18n.js?v=2';
+import { HEROES, ENEMIES, ITEMS, PEOPLE } from './data.js?v=2';
+import * as R from './rules.js?v=2';
+import { S, reset, save, load, hasSave, addMember, removeMember, member, addItem, fullHeal, moveHand } from './state.js?v=2';
+import { BOARDS, TOWNS, CHAPTERS } from './maps.js?v=2';
+import { FIELD, drawField, pickCard, walkSteps, pathTo, setBoard, node } from './field.js?v=2';
+import { battle, drawBattle, B, AUTO } from './battle.js?v=2';
+import { fieldMenu, town, setTownTalk, howToPlay } from './menu.js?v=2';
+import { STORY, TALK } from './story.js?v=2';
+import { CINE, playGolden, drawAura, drawFighter, beamClash, playExchange } from './cinema.js?v=2';
 
 // ---------- loading ----------
 const CHARS = ['SamuraiBlue', 'Master', 'Cavegirl2', 'Statue', 'Woman', 'Vampire', 'OldMan', 'OldMan2', 'Villager', 'Villager2', 'Villager3', 'Villager4', 'Villager5', 'Princess', 'GoldStatue', 'Monk', 'Monk2', 'Eskimo', 'Noble', 'Inspector', 'Hunter', 'NinjaLeaf',
@@ -392,7 +392,7 @@ async function title() {
 }
 
 // ---------- the loop ----------
-function frame() {
+function frame(show = true) {
   pollInput();
   if (input.pressed('a') || input.pressed('b')) initAudio();
   const steps = G.speed || 1;
@@ -403,7 +403,7 @@ function frame() {
   }
   draw();
   endInput();
-  present();
+  if (show) present();
 }
 function draw() {
   if (scene === 'title') drawTitle();
@@ -421,7 +421,9 @@ function loop(ts) {
   if (!last) last = ts;
   acc += Math.min(100, ts - last); last = ts;
   let n = 0;
-  while (acc >= 1000 / 60 && n < 4) { frame(); acc -= 1000 / 60; n++; }
+  // 60 ticks a second on any screen (120 Hz ProMotion, 30 Hz Low Power Mode); only the last one is shown
+  while (acc >= 1000 / 60 && n < 4) { acc -= 1000 / 60; n++; }
+  for (let i = 0; i < n; i++) frame(i === n - 1);
   requestAnimationFrame(loop);
 }
 
@@ -514,6 +516,11 @@ await loadImages([
 setupTouch();
 setLang(LANG);
 requestAnimationFrame(loop);
+// iPhone and iPad close background tabs without warning: the game already saves at chapters and springs,
+// so it also keeps the journey when the page is hidden while standing on the board
+const keep = () => { if (scene === 'field' && !FIELD.moving && !G.stopAt) save(); };
+addEventListener('pagehide', keep);
+document.addEventListener('visibilitychange', () => { if (document.hidden) keep(); });
 window.READY = true;
 game();
 void textW; void windowBox; void drawCard; void cursor; void canvas; void wrap; void jingle; void member; void ENEMIES; void AUTO;

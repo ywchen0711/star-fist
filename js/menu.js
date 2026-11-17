@@ -1,13 +1,13 @@
 // The field menu (status, items, save, how to play), the status screen, towns and shops.
-import { ctx, W, H, text, textW, windowBox, bar, face, itemIcon, drawCard, drawMoveCard, cursor, paintSky, fighterArt, bigText } from './gfx.js';
-import { input } from './input.js';
-import { sfx } from './audio.js';
-import { push, UI, menu, notice, say, wrap, fit } from './ui.js';
-import { L, tn, num } from './i18n.js';
-import { HEROES, SPECIALS, ITEMS, needExp } from './data.js';
-import * as R from './rules.js';
-import { S, save, addItem, fullHeal } from './state.js';
-import { TOWNS, BOARDS } from './maps.js';
+import { ctx, W, H, text, textW, windowBox, bar, face, itemIcon, drawCard, drawMoveCard, cursor, paintSky, fighterArt, bigText } from './gfx.js?v=2';
+import { input } from './input.js?v=2';
+import { sfx } from './audio.js?v=2';
+import { push, UI, menu, notice, say, wrap, fit } from './ui.js?v=2';
+import { L, tn, num } from './i18n.js?v=2';
+import { HEROES, SPECIALS, ITEMS, needExp } from './data.js?v=2';
+import * as R from './rules.js?v=2';
+import { S, save, addItem, fullHeal } from './state.js?v=2';
+import { TOWNS, BOARDS } from './maps.js?v=2';
 
 // ---------- status ----------
 export function statusScreen() {

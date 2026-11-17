@@ -1,6 +1,6 @@
 // The saved state: the party, items, coins, story flags and where Kai stands on the board.
-import { newHero, maxHp, joinLevel, deal } from './rules.js';
-import { HEROES } from './data.js';
+import { newHero, maxHp, joinLevel, deal } from './rules.js?v=2';
+import { HEROES } from './data.js?v=2';
 
 export const S = {};
 export function reset() {

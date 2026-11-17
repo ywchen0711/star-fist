@@ -1,12 +1,12 @@
 // The close-up exchanges: rushes, ki blasts, beams, the beam clash where Z is mashed to push back,
 // and the Golden Flame awakening. The fighters are the 16x16 pack sprites scaled up; the auras,
 // speed lines, beams and shockwaves are drawn in code.
-import { ctx, W, H, text, bigText, textW, fighterArt, silhouette, goldTint, fxDraw, mix, hash, view, bar, windowBox } from './gfx.js';
-import { input } from './input.js';
-import { sfx, hum } from './audio.js';
-import { push, UI } from './ui.js';
-import { L, tn, num } from './i18n.js';
-import { SPECIALS } from './data.js';
+import { ctx, W, H, text, bigText, textW, fighterArt, silhouette, goldTint, fxDraw, mix, hash, view, bar, windowBox } from './gfx.js?v=2';
+import { input } from './input.js?v=2';
+import { sfx, hum } from './audio.js?v=2';
+import { push, UI } from './ui.js?v=2';
+import { L, tn, num } from './i18n.js?v=2';
+import { SPECIALS } from './data.js?v=2';
 
 export const CINE = { fast: false, mashRate: 7, freeze: null };
 const GROUND = 178;

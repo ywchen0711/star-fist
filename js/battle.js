@@ -1,16 +1,16 @@
 // The battle screen: two fighters face off on a side-view stage, both sides play a card, the higher
 // star attacks, and each exchange is shown as a close-up. Party members can switch in and out.
-import { goldTint } from './gfx.js';
-import { ctx, W, H, text, textW, bigText, windowBox, bar, drawCard, CARD_W, CARD_H, cardBack, paintSky, fighterArt, face, itemIcon, drawTwinkles, mix, hash } from './gfx.js';
-import { input } from './input.js';
-import { sfx, playMusic, currentSong, jingle } from './audio.js';
-import { push, UI, menu, notice, say, wrap, fit } from './ui.js';
-import { L, tn, num } from './i18n.js';
-import { HEROES, ENEMIES, SPECIALS, ITEMS, BLAST_KI, COUNTER_KI, GOLD_COST } from './data.js';
-import * as R from './rules.js';
-import { S } from './state.js';
-import { BOARDS } from './maps.js';
-import { playExchange, playTie, beamClash, playGolden, drawAura, CINE } from './cinema.js';
+import { goldTint } from './gfx.js?v=2';
+import { ctx, W, H, text, textW, bigText, windowBox, bar, drawCard, CARD_W, CARD_H, cardBack, paintSky, fighterArt, face, itemIcon, drawTwinkles, mix, hash } from './gfx.js?v=2';
+import { input } from './input.js?v=2';
+import { sfx, playMusic, currentSong, jingle } from './audio.js?v=2';
+import { push, UI, menu, notice, say, wrap, fit } from './ui.js?v=2';
+import { L, tn, num } from './i18n.js?v=2';
+import { HEROES, ENEMIES, SPECIALS, ITEMS, BLAST_KI, COUNTER_KI, GOLD_COST } from './data.js?v=2';
+import * as R from './rules.js?v=2';
+import { S } from './state.js?v=2';
+import { BOARDS } from './maps.js?v=2';
+import { playExchange, playTie, beamClash, playGolden, drawAura, CINE } from './cinema.js?v=2';
 
 export let B = null;
 const rand = Math.random;

@@ -293,12 +293,47 @@ export async function loadImages(list) {
   list.forEach(([k], i) => { IMG[k] = got[i]; });
 }
 // character sheets: a column per facing (down, up, left, right), rows 0-3 walk, 4 attack, 5 jump, 6 item
+// Safari (iPhone, iPad and Mac) ignores ctx.filter, so there the same colour change is worked out on
+// the pixels: hue-rotate, saturate and brightness, in order, as the browser filter would do them.
+export const HAS_FILTER = (() => { try { return 'filter' in document.createElement('canvas').getContext('2d'); } catch (e) { return false; } })();
+const mmul = (a, b) => { const o = []; for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) o.push(a[r * 3] * b[c] + a[r * 3 + 1] * b[3 + c] + a[r * 3 + 2] * b[6 + c]); return o; };
+const fmCache = new Map();
+function filterMatrix(f) {
+  if (fmCache.has(f)) return fmCache.get(f);
+  let m = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  for (const [, fn, v] of f.matchAll(/([a-z-]+)\(\s*(-?[\d.]+)/g)) {
+    const n = parseFloat(v);
+    let k;
+    if (fn === 'hue-rotate') {
+      const a = (n * Math.PI) / 180, c = Math.cos(a), s = Math.sin(a);
+      k = [0.213 + c * 0.787 - s * 0.213, 0.715 - c * 0.715 - s * 0.715, 0.072 - c * 0.072 + s * 0.928,
+        0.213 - c * 0.213 + s * 0.143, 0.715 + c * 0.285 + s * 0.140, 0.072 - c * 0.072 - s * 0.283,
+        0.213 - c * 0.213 - s * 0.787, 0.715 - c * 0.715 + s * 0.715, 0.072 + c * 0.928 + s * 0.072];
+    } else if (fn === 'saturate') {
+      k = [0.213 + 0.787 * n, 0.715 - 0.715 * n, 0.072 - 0.072 * n, 0.213 - 0.213 * n, 0.715 + 0.285 * n, 0.072 - 0.072 * n, 0.213 - 0.213 * n, 0.715 - 0.715 * n, 0.072 + 0.928 * n];
+    } else if (fn === 'brightness') k = [n, 0, 0, 0, n, 0, 0, 0, n];
+    else continue;
+    m = mmul(k, m);
+  }
+  fmCache.set(f, m);
+  return m;
+}
+export function filterPixels(x, w, h, f) {
+  const m = filterMatrix(f), d = x.getImageData(0, 0, w, h), p = d.data;
+  for (let i = 0; i < p.length; i += 4) {
+    if (!p[i + 3]) continue;
+    const r = p[i], g = p[i + 1], b = p[i + 2];
+    p[i] = m[0] * r + m[1] * g + m[2] * b; p[i + 1] = m[3] * r + m[4] * g + m[5] * b; p[i + 2] = m[6] * r + m[7] * g + m[8] * b;
+  }
+  x.putImageData(d, 0, 0);
+}
 const frameCache = new Map();
 function cut(img, sx, sy, w, h, { flip = false, filter = null, ghost = false } = {}) {
   const c = canvas(w, h);
-  if (filter) c.x.filter = filter;
+  if (filter && HAS_FILTER) c.x.filter = filter;
   if (flip) { c.x.translate(w, 0); c.x.scale(-1, 1); }
   c.x.drawImage(img, sx, sy, w, h, 0, 0, w, h);
+  if (filter && !HAS_FILTER) filterPixels(c.x, w, h, filter);
   if (ghost) {
     c.x.setTransform(1, 0, 0, 1, 0, 0); c.x.filter = 'none';
     c.x.globalCompositeOperation = 'source-atop'; c.x.fillStyle = 'rgba(150,220,255,0.55)'; c.x.fillRect(0, 0, w, h);
